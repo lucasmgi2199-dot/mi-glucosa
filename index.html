@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0A3A4C">
+<title>Mi Glucosa</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--teal:#0A3A4C;--teal2:#4A8BA0;--soft:#CFE0E6;--bg:#ECECEC;--card:#fff;--line:#D9D9D9;--text:#1E2B30;--muted:#7A8790;--red:#F04B4B;--green:#2EAD6B;--amber:#E9A23B}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;background:#cfd4d6}
+body{font-family:Poppins,system-ui,-apple-system,Roboto,sans-serif;color:var(--text)}
+button,input{font-family:inherit;color:inherit}
+button{cursor:pointer}
+.app{max-width:480px;margin:0 auto;min-height:100vh;background:var(--bg);padding-bottom:110px;position:relative}
+.view{display:none}.view.on{display:block}
+.head{background:var(--teal);color:#fff;padding:22px 24px 18px;border-radius:0 0 36px 0}
+.head h1{margin:0;font-size:22px;font-weight:600}
+.wrap{padding:0 20px}
+
+/* Inicio */
+.hero{background:var(--teal);color:#fff;padding:26px 24px 16px;border-radius:0 0 36px 36px}
+.hero h1{margin:0 0 6px;font-size:28px;font-weight:700}
+.big{display:flex;align-items:baseline;gap:14px}
+.big b{font-size:56px;font-weight:500;line-height:1.1}
+.big span{font-size:26px;font-weight:600}
+.big .st{margin-left:auto;font-size:20px;font-weight:500;display:flex;align-items:center;gap:10px}
+.dot{width:14px;height:14px;border-radius:50%;display:inline-block;flex:none}
+.big .dot{width:26px;height:26px}
+.sub{display:flex;justify-content:space-between;font-size:17px;margin-top:4px;opacity:.95}
+.chart{width:100%;display:block;margin-top:10px}
+.empty{opacity:.7;font-size:14px;padding:26px 0 14px;text-align:center}
+.today-t{text-align:center;color:var(--muted);font-size:18px;margin:16px 0 10px}
+.segs{display:flex;gap:10px;margin-bottom:20px}
+.segs i{flex:1;height:11px;border-radius:8px;border:1.5px solid var(--line);background:#fff}
+.segs i.f{background:var(--teal2);border-color:var(--teal2)}
+.row2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px}
+.lbl{font-weight:600;font-size:18px;margin:0 0 8px 12px;display:flex;align-items:center;justify-content:space-between}
+.field{width:100%;min-width:0;height:58px;border:1.5px solid var(--line);border-radius:22px;background:#fff;padding:0 14px;font-size:17px}
+.field:disabled{color:var(--text);opacity:1;background:#fff}
+.chk{display:flex;align-items:center;gap:6px;font-size:12px;white-space:nowrap;font-weight:600;cursor:pointer;user-select:none}
+.chk input{position:absolute;opacity:0;pointer-events:none}
+.chk .box{width:24px;height:24px;flex:none;border:2px solid var(--teal);border-radius:7px;display:grid;place-items:center;background:#fff}
+.chk input:checked+.box{background:var(--teal)}
+.chk input:checked+.box::after{content:"";width:7px;height:13px;border:solid #fff;border-width:0 3px 3px 0;transform:rotate(45deg) translate(-1px,-2px)}
+.types{display:flex;background:#fff;border:1.5px solid var(--line);border-radius:22px;margin:20px 0;padding:6px 4px}
+.types button{flex:1;border:0;background:none;padding:12px 2px;font-size:12px;color:var(--muted);border-left:1.5px solid var(--line);line-height:1.2}
+.types button:first-child{border-left:0}
+.types button.on{color:var(--text);font-weight:600;font-size:14px}
+.valcard{background:#fff;border:1.5px solid var(--line);border-radius:24px;display:flex;align-items:center;justify-content:space-between;padding:22px 26px}
+.circ{width:62px;height:62px;border-radius:50%;border:0;background:var(--teal);color:#fff;font-size:34px;line-height:1;display:grid;place-items:center;flex:none}
+.valmid{text-align:center}
+.valmid input{width:150px;border:0;background:none;text-align:center;font-size:66px;font-weight:700;letter-spacing:-2px;padding:0;outline:none}
+.valmid div{color:var(--muted);font-size:20px;margin-top:-6px}
+.note{margin:16px 0 0;font-size:17px}
+.btn{width:100%;height:62px;border:0;border-radius:20px;background:var(--teal);color:#fff;font-size:19px;font-weight:500;margin-top:26px}
+.btn.lite{background:#fff;color:var(--teal);border:1.5px solid var(--teal)}
+.btn.sm{height:50px;font-size:16px;margin-top:12px}
+
+/* Historial */
+.bar{display:flex;justify-content:flex-end;padding:16px 20px 4px;gap:10px;align-items:center}
+.pill{display:flex;align-items:center;gap:8px;border:1.5px solid var(--line);background:#fff;border-radius:16px;padding:10px 16px;font-size:15px}
+.pill.on{border-color:var(--teal);background:var(--soft)}
+.factive{margin:6px 20px 0;background:var(--soft);border-radius:14px;padding:10px 14px;font-size:14px;display:flex;justify-content:space-between;align-items:center;gap:10px}
+.factive button{border:0;background:var(--teal);color:#fff;border-radius:10px;padding:8px 12px;font-size:13px}
+.day{text-align:center;color:var(--muted);font-size:16px;margin:18px 0 8px}
+.card{background:#fff;border:1.5px solid var(--line);border-radius:20px;padding:4px 16px}
+.item{display:flex;gap:12px;align-items:center;padding:14px 0;border-top:1.5px solid var(--line);cursor:pointer}
+.item:first-child{border-top:0}
+.ic{width:52px;height:52px;border-radius:50%;background:var(--soft);display:grid;place-items:center;flex:none}
+.ic svg{width:28px;height:28px;stroke:var(--teal);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.mid{flex:1;min-width:0}
+.mid .v{font-size:22px;font-weight:600}.mid .v small{font-size:15px;font-weight:500}
+.mid .t{font-size:14px;margin-top:2px}
+.mid .n{font-size:13px;color:var(--muted);font-style:italic;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rt{text-align:right;font-size:14px;display:flex;flex-direction:column;align-items:flex-end;gap:14px}
+.rt .s{display:flex;align-items:center;gap:6px}
+.none{text-align:center;color:var(--muted);padding:40px 20px}
+
+/* Estadísticas */
+.tabs{display:flex;background:#fff;border:1.5px solid var(--line);border-radius:18px;margin:16px 20px 8px;padding:6px 4px}
+.tabs button{flex:1;border:0;background:none;padding:10px 0;font-size:14px;color:var(--muted);border-left:1.5px solid var(--line)}
+.tabs button:first-child{border-left:0}
+.tabs button.on{color:var(--text);font-weight:600}
+.nav2{display:flex;align-items:center;justify-content:space-between;padding:6px 26px 0;font-weight:600}
+.nav2 button{border:0;background:none;font-size:24px;color:var(--muted);padding:4px 10px}
+.nav2 button:disabled{opacity:.25}
+.legend{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:13px;margin:2px 22px 14px}
+.legend i{width:22px;border-top:2px dashed #F07C7C}
+.sum{margin:0 20px;background:#fff;border:1.5px solid var(--line);border-radius:20px;padding:16px 20px;display:flex;justify-content:space-between;gap:10px}
+.sum .k{font-weight:600;font-size:15px}
+.sum .avg{font-size:34px;color:var(--teal);margin-top:4px}.sum .avg small{font-size:16px;color:var(--teal2)}
+.sum .mm{text-align:center}.sum .mm b{display:block;font-size:24px;font-weight:500;color:var(--teal);margin-top:6px}.sum .mm small{color:var(--teal2);font-size:13px}
+.cnt{text-align:center;color:var(--muted);font-size:13px;margin-top:10px}
+
+/* Ajustes */
+.sec{background:#fff;border:1.5px solid var(--line);border-radius:20px;padding:18px;margin-top:18px}
+.sec h2{margin:0 0 12px;font-size:17px;font-weight:600}
+.lim{display:flex;align-items:center;gap:12px;margin:10px 0}
+.lim label{flex:1;font-size:16px}
+.lim input{width:110px;height:50px;border:1.5px solid var(--line);border-radius:14px;text-align:center;font-size:20px;font-weight:600}
+.lim span{color:var(--muted);font-size:14px;width:48px}
+.hint{font-size:13px;color:var(--muted);margin:10px 0 0;line-height:1.45}
+
+/* Menú inferior */
+.tabbar{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;background:#fff;border-radius:32px 32px 0 0;display:flex;justify-content:space-around;padding:10px 10px calc(12px + env(safe-area-inset-bottom));box-shadow:0 -4px 18px rgba(0,0,0,.06);z-index:5}
+.tabbar button{border:0;background:none;display:flex;flex-direction:column;align-items:center;gap:2px;font-size:11px;color:var(--muted);width:76px}
+.tabbar svg{width:50px;height:50px;padding:12px;border-radius:50%;stroke:var(--teal);fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.tabbar button.on{color:var(--teal);font-weight:600}
+.tabbar button.on svg{background:var(--soft)}
+
+/* Hojas y avisos */
+.shade{position:fixed;inset:0;background:rgba(0,0,0,.35);display:none;z-index:10}
+.shade.on{display:block}
+.sheet{position:fixed;left:50%;bottom:0;transform:translate(-50%,105%);width:100%;max-width:480px;background:var(--bg);border-radius:28px 28px 0 0;padding:22px 20px calc(24px + env(safe-area-inset-bottom));transition:transform .22s;z-index:11}
+.sheet.on{transform:translate(-50%,0)}
+.sheet h3{margin:0 0 14px;font-size:19px;font-weight:600}
+.sheet p{margin:0 0 6px;color:var(--muted);font-size:15px}
+.btn.red{background:var(--red)}
+.preview{background:#FFF4D6;color:#6B5200;font-size:13px;padding:10px 16px;text-align:center;line-height:1.4}
+.toast{position:fixed;left:50%;bottom:120px;transform:translateX(-50%);background:var(--teal);color:#fff;padding:12px 20px;border-radius:14px;font-size:15px;opacity:0;pointer-events:none;transition:opacity .2s;z-index:20;max-width:90%;text-align:center}
+.toast.on{opacity:1}
+</style>
+</head>
+<body>
+<div class="app">
+<div class="preview" id="preview" hidden>Vista previa: acá los registros no se guardan de forma segura y exportar no funciona. Instalá la app para usarla de verdad.</div>
+
+<!-- INICIO -->
+<section class="view on" id="v-inicio">
+  <div class="hero">
+    <h1>Última medición</h1>
+    <div id="last"></div>
+    <div id="homeChart"></div>
+  </div>
+  <div class="wrap">
+    <div class="today-t">Mediciones de hoy</div>
+    <div class="segs" id="segs"></div>
+    <div class="row2">
+      <div><div class="lbl">Fecha</div><input class="field" type="date" id="fDate"></div>
+      <div><div class="lbl">Hora
+        <label class="chk"><input type="checkbox" id="fNow"><span class="box"></span>Hora actual</label></div>
+        <input class="field" type="time" id="fTime"></div>
+    </div>
+    <div class="types" id="types">
+      <button data-t="ayunas">En ayunas</button><button data-t="antes">Antes de comer</button><button data-t="despues">Después de comer</button><button data-t="dormir">Antes de dormir</button>
+    </div>
+    <div class="lbl">Valor de glucosa</div>
+    <div class="valcard">
+      <button class="circ" id="minus" aria-label="Restar">−</button>
+      <div class="valmid"><input id="fVal" type="text" inputmode="numeric" pattern="[0-9]*" maxlength="3" aria-label="Valor de glucosa"><div>mg/dL</div></div>
+      <button class="circ" id="plus" aria-label="Sumar">+</button>
+    </div>
+    <input class="field note" id="fNote" placeholder="Notas para el registro…" maxlength="120">
+    <button class="btn" id="add">Añadir registro</button>
+  </div>
+</section>
+
+<!-- HISTORIAL -->
+<section class="view" id="v-historial">
+  <div class="head"><h1>Historial</h1></div>
+  <div class="bar"><button class="pill" id="fBtn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 6h16M7 12h10M10 18h4"/></svg>Filtro<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg></button></div>
+  <div id="fActive"></div>
+  <div class="wrap" id="hist"></div>
+</section>
+
+<!-- ESTADÍSTICAS -->
+<section class="view" id="v-estadisticas">
+  <div class="head"><h1>Estadísticas</h1></div>
+  <div class="tabs" id="ptabs">
+    <button data-p="d">1 día</button><button data-p="w">7 días</button><button data-p="m">Mes</button><button data-p="3">3 meses</button><button data-p="6">6 meses</button>
+  </div>
+  <div class="nav2"><button id="prev" aria-label="Anterior">‹</button><span id="plabel"></span><button id="next" aria-label="Siguiente">›</button></div>
+  <div style="padding:0 12px" id="statChart"></div>
+  <div class="legend"><i></i>Límites del rango objetivo</div>
+  <div class="sum" id="sum"></div>
+  <div class="cnt" id="cnt"></div>
+</section>
+
+<!-- AJUSTES -->
+<section class="view" id="v-ajustes">
+  <div class="head"><h1>Ajustes</h1></div>
+  <div class="wrap">
+    <div class="sec">
+      <h2>Rango objetivo de glucosa</h2>
+      <div class="lim"><label for="sMin">Límite mínimo</label><input id="sMin" type="text" inputmode="numeric" maxlength="3"><span>mg/dL</span></div>
+      <div class="lim"><label for="sMax">Límite máximo</label><input id="sMax" type="text" inputmode="numeric" maxlength="3"><span>mg/dL</span></div>
+      <button class="btn sm" id="sSave">Guardar límites</button>
+      <p class="hint">Por debajo del mínimo se marca <b>Bajo</b>, por encima del máximo <b>Alto</b>. Usá los valores que te indicó tu médico.</p>
+    </div>
+    <div class="sec">
+      <h2>Datos</h2>
+      <p class="hint" id="count" style="margin:0 0 4px"></p>
+      <button class="btn sm lite" id="imp">Importar datos (CSV)</button>
+      <input type="file" id="impFile" accept=".csv,text/csv,text/plain" hidden>
+      <button class="btn sm" id="expCsv">Exportar CSV</button>
+      <button class="btn sm" id="expPdf">Exportar PDF</button>
+      <p class="hint">Los registros se guardan solo en este teléfono. Exportá un CSV de vez en cuando como copia de seguridad: con “Importar datos” lo recuperás en este u otro teléfono.</p>
+    </div>
+    <div class="sec" id="instSec" hidden>
+      <h2>Instalar</h2>
+      <button class="btn sm" id="inst">Instalar en el teléfono</button>
+    </div>
+  </div>
+</section>
+
+<nav class="tabbar" id="tabbar">
+  <button data-v="inicio" class="on"><svg viewBox="0 0 24 24"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>Inicio</button>
+  <button data-v="historial"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>Historial</button>
+  <button data-v="estadisticas"><svg viewBox="0 0 24 24"><path d="M5 19v-7M11 19V5M17 19v-10M3 21h18"/></svg>Estadísticas</button>
+  <button data-v="ajustes"><svg viewBox="0 0 24 24"><path d="M4 6h9M17 6h3M4 12h3M11 12h9M4 18h11M19 18h1"/><circle cx="15" cy="6" r="2"/><circle cx="9" cy="12" r="2"/><circle cx="17" cy="18" r="2"/></svg>Ajustes</button>
+</nav>
+
+<div class="shade" id="shade"></div>
+<div class="sheet" id="sheet"></div>
+<div class="toast" id="toast"></div>
+</div>
+
+<script>
+'use strict';
+const $ = s => document.querySelector(s);
+const TYPES = {ayunas:'En ayunas', antes:'Antes de comer', despues:'Después de comer', dormir:'Antes de dormir'};
+const MES = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+const MES3 = ['ene.','feb.','mar.','abr.','may.','jun.','jul.','ago.','sep.','oct.','nov.','dic.'];
+const DIA = ['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
+const DAY = 864e5;
+const ICON = {
+  ayunas:'<path d="M3 18h18M6.5 18a5.5 5.5 0 0 1 11 0M12 3.5v4M9.5 6 12 3.5 14.5 6M4.5 11l1.5 1M19.5 11 18 12M3 21.5h18"/>',
+  antes:'<path d="M7 3v18M4.5 3v5a2.5 2.5 0 0 0 5 0V3M16.5 21V3c-2 1.2-3 3.5-3 6.5 0 2.5 1.2 3.5 3 3.5"/>',
+  despues:'<circle cx="12" cy="12" r="8.5"/><path d="M8.3 12.4l2.5 2.5 5-5.3"/>',
+  dormir:'<path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/>'
+};
+
+/* ---------- Guardado (en el teléfono) ---------- */
+const mem = {};
+const ls = {
+  get(k){ try { return localStorage.getItem(k); } catch { return mem[k] ?? null; } },
+  set(k,v){ try { localStorage.setItem(k,v); } catch { mem[k] = v; } }
+};
+let recs = JSON.parse(ls.get('glucosa.registros') || '[]');
+let cfg = Object.assign({min:70, max:150, now:true, type:'ayunas'}, JSON.parse(ls.get('glucosa.ajustes') || '{}'));
+const saveRecs = () => { recs.sort((a,b) => b.t - a.t); ls.set('glucosa.registros', JSON.stringify(recs)); };
+const saveCfg = () => ls.set('glucosa.ajustes', JSON.stringify(cfg));
+try { navigator.storage?.persist?.(); } catch {}
+
+/* ---------- Utilidades ---------- */
+const p2 = n => String(n).padStart(2,'0');
+const hm = d => p2(d.getHours()) + ':' + p2(d.getMinutes());
+const ymd = d => d.getFullYear() + '-' + p2(d.getMonth()+1) + '-' + p2(d.getDate());
+const fmtShort = t => { const d = new Date(t); return d.getDate() + ' ' + MES3[d.getMonth()] + ' ' + hm(d); };
+const fmtFull = t => { const d = new Date(t); return p2(d.getDate()) + '/' + p2(d.getMonth()+1) + '/' + d.getFullYear() + ' ' + hm(d); };
+const startDay = t => { const d = new Date(t); d.setHours(0,0,0,0); return d.getTime(); };
+const addMonths = (t, n) => { const d = new Date(t); d.setMonth(d.getMonth() + n); return d.getTime(); };
+const status = v => v < cfg.min ? ['Bajo','var(--amber)','#E9A23B'] : v > cfg.max ? ['Alto','var(--red)','#F04B4B'] : ['Normal','var(--green)','#2EAD6B'];
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const clampVal = v => Math.min(600, Math.max(20, v));
+function toast(msg){ const t = $('#toast'); t.textContent = msg; t.classList.add('on'); clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove('on'), 2600); }
+
+/* ---------- Gráfico (SVG) ---------- */
+function chartSVG(o){
+  const W = 340, H = o.h || 210, L = 40, R = 16, T = 12, B = 32;
+  const sx = x => L + (x - o.x0) / (o.x1 - o.x0) * (W - L - R);
+  const sy = y => T + (1 - (y - o.y0) / (o.y1 - o.y0)) * (H - T - B);
+  const ink = o.dark ? 'rgba(255,255,255,.9)' : '#3D4B52', grid = o.dark ? 'rgba(255,255,255,.16)' : '#D2D2D2';
+  let s = `<svg class="chart" viewBox="0 0 ${W} ${H}" font-family="Poppins,system-ui,sans-serif">`;
+  for (const y of o.yt) s += `<line x1="${L}" x2="${W-R}" y1="${sy(y)}" y2="${sy(y)}" stroke="${grid}"/><text x="${L-8}" y="${sy(y)+4}" text-anchor="end" font-size="12" fill="${ink}">${y}</text>`;
+  if (o.lim) for (const y of o.lim) if (y > o.y0 && y < o.y1) s += `<line x1="${L}" x2="${W-R}" y1="${sy(y)}" y2="${sy(y)}" stroke="#F07C7C" stroke-width="1.5" stroke-dasharray="6 4"/>`;
+  for (const [x, lab] of o.xt) s += `<text x="${sx(x)}" y="${H-8}" text-anchor="middle" font-size="12" fill="${ink}">${lab}</text>`;
+  if (o.xunit) s += `<text x="${W-2}" y="${H-8}" text-anchor="end" font-size="11" fill="${ink}">${o.xunit}</text>`;
+  const pts = o.pts;
+  if (pts.length > 1) s += `<polyline fill="none" stroke="${o.dark ? '#5D9DB3' : '#1F4F63'}" stroke-width="2.5" stroke-linejoin="round" points="${pts.map(p => sx(p.x)+','+sy(p.y)).join(' ')}"/>`;
+  pts.forEach((p, i) => {
+    const c = p.c || '#5D9DB3', last = o.ring && i === pts.length - 1;
+    if (last) s += `<circle cx="${sx(p.x)}" cy="${sy(p.y)}" r="10" fill="${c}" fill-opacity=".3" stroke="${c}" stroke-width="2"/>`;
+    s += `<circle cx="${sx(p.x)}" cy="${sy(p.y)}" r="${pts.length > 60 ? 2.5 : 4}" fill="${c}"/>`;
+  });
+  return s + '</svg>';
+}
+
+/* ---------- INICIO ---------- */
+let curType = cfg.type in TYPES ? cfg.type : 'ayunas';
+function renderHome(){
+  const last = recs[0];
+  if (last) {
+    const [st, col] = status(last.v);
+    $('#last').innerHTML = `<div class="big"><b>${last.v}</b><span>mg/dL</span><div class="st"><i class="dot" style="background:${col}"></i>${st}</div></div>
+      <div class="sub"><span>${fmtShort(last.t)}</span><span>${TYPES[last.type]}</span></div>`;
+  } else $('#last').innerHTML = `<div class="big"><b>—</b><span>mg/dL</span></div><div class="sub"><span>Todavía no hay registros</span></div>`;
+
+  const t0 = startDay(Date.now());
+  const today = recs.filter(r => r.t >= t0 && r.t < t0 + DAY).reverse();
+  if (!today.length) $('#homeChart').innerHTML = '<div class="empty">Sin mediciones hoy</div>';
+  else {
+    const xs = today.map(r => (r.t - t0) / 36e5), vs = today.map(r => r.v);
+    let x1 = Math.min(24, Math.ceil(Math.max(...xs)) + 1), x0 = Math.max(0, Math.floor(Math.min(...xs)) - 3);
+    if (x1 - x0 < 6) { x0 = Math.max(0, x1 - 6); x1 = Math.max(x1, x0 + 6); }
+    const step = x1 - x0 > 12 ? 2 : 1, xt = [];
+    for (let h = x0; h <= x1; h += step) xt.push([h, h]);
+    const lo = Math.min(...vs), hi = Math.max(...vs), pad = Math.max(10, (hi - lo) * .15);
+    const st = [10, 20, 25, 50, 100].find(k => (hi - lo + 2 * pad) / k <= 4) || 100;
+    const y0 = Math.floor((lo - pad) / st) * st, y1 = Math.ceil((hi + pad) / st) * st, yt = [];
+    for (let y = y0; y <= y1; y += st) yt.push(y);
+    $('#homeChart').innerHTML = chartSVG({pts: xs.map((x,i) => ({x, y: vs[i]})), x0, x1, xt, xunit:'h', y0, y1, yt, dark:true, ring:true, h:190});
+  }
+  const n = today.length, total = Math.max(6, n);
+  $('#segs').innerHTML = Array.from({length: total}, (_, i) => `<i class="${i < n ? 'f' : ''}"></i>`).join('');
+  $('#types').querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.t === curType));
+}
+function syncNow(){
+  const on = $('#fNow').checked;
+  $('#fDate').disabled = $('#fTime').disabled = on;
+  if (on) { const d = new Date(); $('#fDate').value = ymd(d); $('#fTime').value = hm(d); }
+}
+$('#fNow').checked = cfg.now;
+$('#fNow').addEventListener('change', () => { cfg.now = $('#fNow').checked; saveCfg(); const d = new Date(); $('#fDate').value = ymd(d); $('#fTime').value = hm(d); syncNow(); });
+setInterval(() => { if ($('#fNow').checked) syncNow(); }, 15000);
+document.addEventListener('visibilitychange', () => { if (!document.hidden) { syncNow(); renderHome(); } });
+
+$('#types').addEventListener('click', e => {
+  const b = e.target.closest('button'); if (!b) return;
+  curType = cfg.type = b.dataset.t; saveCfg(); renderHome();
+});
+const val = $('#fVal');
+val.value = recs[0]?.v ?? 110;
+val.addEventListener('focus', () => setTimeout(() => val.select(), 0));
+val.addEventListener('input', () => { val.value = val.value.replace(/\D/g, '').slice(0,3); });
+val.addEventListener('blur', () => { const v = parseInt(val.value, 10); if (v) val.value = clampVal(v); });
+const bump = d => { val.value = clampVal((parseInt(val.value, 10) || 110) + d); };
+$('#minus').addEventListener('click', () => bump(-1));
+$('#plus').addEventListener('click', () => bump(1));
+
+$('#add').addEventListener('click', () => {
+  const v = parseInt(val.value, 10);
+  if (!v || v < 20 || v > 600) return toast('Ingresá un valor entre 20 y 600 mg/dL');
+  let t;
+  if ($('#fNow').checked) t = Date.now();
+  else {
+    if (!$('#fDate').value || !$('#fTime').value) return toast('Elegí la fecha y la hora');
+    t = new Date($('#fDate').value + 'T' + $('#fTime').value).getTime();
+  }
+  recs.push({id: Date.now().toString(36) + Math.random().toString(36).slice(2,6), t, v, type: curType, note: $('#fNote').value.trim()});
+  saveRecs();
+  $('#fNote').value = '';
+  renderHome();
+  toast('Registro guardado: ' + v + ' mg/dL');
+});
+
+/* ---------- HISTORIAL ---------- */
+let filt = {from:'', to:''};
+function renderHist(){
+  const from = filt.from ? new Date(filt.from + 'T00:00').getTime() : -Infinity;
+  const to = filt.to ? new Date(filt.to + 'T00:00').getTime() + DAY : Infinity;
+  const list = recs.filter(r => r.t >= from && r.t < to);
+  const on = filt.from || filt.to;
+  $('#fBtn').classList.toggle('on', !!on);
+  const f = s => s ? s.split('-').reverse().join('/') : '…';
+  $('#fActive').innerHTML = on ? `<div class="factive"><span>Del ${f(filt.from)} al ${f(filt.to)} · ${list.length} registro${list.length === 1 ? '' : 's'}</span><button id="fReset">Restablecer</button></div>` : '';
+  if (on) $('#fReset').onclick = () => { filt = {from:'', to:''}; renderHist(); };
+  if (!list.length) { $('#hist').innerHTML = `<div class="none">${on ? 'No hay registros en ese período.' : 'Todavía no hay registros.<br>Cargá el primero desde Inicio.'}</div>`; return; }
+  const groups = new Map();
+  for (const r of list) { const k = startDay(r.t); if (!groups.has(k)) groups.set(k, []); groups.get(k).push(r); }
+  const t0 = startDay(Date.now()), y = new Date().getFullYear();
+  let html = '';
+  for (const [k, rs] of groups) {
+    const d = new Date(k), base = d.getDate() + ' ' + MES[d.getMonth()] + (d.getFullYear() !== y ? ' ' + d.getFullYear() : '');
+    const lab = k === t0 ? 'Hoy, ' + base : k === startDay(t0 - 1) ? 'Ayer, ' + base : DIA[d.getDay()].replace(/^./, c => c.toUpperCase()) + ', ' + base;
+    html += `<div class="day">${lab}</div><div class="card">` + rs.map(r => {
+      const [st, col] = status(r.v);
+      return `<div class="item" data-id="${r.id}"><div class="ic"><svg viewBox="0 0 24 24">${ICON[r.type]}</svg></div>
+        <div class="mid"><div class="v">${r.v} <small>mg/dL</small></div><div class="t">${TYPES[r.type]}</div>${r.note ? `<div class="n">${esc(r.note)}</div>` : ''}</div>
+        <div class="rt"><div class="s"><i class="dot" style="background:${col}"></i>${st}</div><div>${fmtShort(r.t)}</div></div></div>`;
+    }).join('') + '</div>';
+  }
+  $('#hist').innerHTML = html;
+}
+$('#hist').addEventListener('click', e => {
+  const it = e.target.closest('.item'); if (!it) return;
+  const r = recs.find(x => x.id === it.dataset.id); if (!r) return;
+  openSheet(`<h3>${r.v} mg/dL · ${TYPES[r.type]}</h3><p>${fmtFull(r.t)}${r.note ? ' · ' + esc(r.note) : ''}</p>
+    <button class="btn red sm" id="del">Eliminar registro</button><button class="btn lite sm" data-close>Cancelar</button>`);
+  $('#del').onclick = () => { recs = recs.filter(x => x.id !== r.id); saveRecs(); closeSheet(); renderHist(); renderHome(); toast('Registro eliminado'); };
+});
+$('#fBtn').addEventListener('click', () => {
+  openSheet(`<h3>Filtrar por período</h3>
+    <div class="row2"><div><div class="lbl">Desde</div><input class="field" type="date" id="ff"></div><div><div class="lbl">Hasta</div><input class="field" type="date" id="ft"></div></div>
+    <button class="btn sm" id="fApply">Aplicar</button><button class="btn lite sm" id="fClear">Restablecer (ver todo)</button>`);
+  $('#ff').value = filt.from; $('#ft').value = filt.to;
+  $('#fApply').onclick = () => {
+    let a = $('#ff').value, b = $('#ft').value;
+    if (a && b && a > b) [a, b] = [b, a];
+    filt = {from: a, to: b}; closeSheet(); renderHist();
+  };
+  $('#fClear').onclick = () => { filt = {from:'', to:''}; closeSheet(); renderHist(); };
+});
+
+/* ---------- ESTADÍSTICAS ---------- */
+let per = 'd', off = 0;
+function periodRange(){
+  const now = new Date(), t0 = startDay(now);
+  if (per === 'd') return [t0 + off * DAY, t0 + (off + 1) * DAY];
+  if (per === 'w') { const e = t0 + DAY + off * 7 * DAY; return [e - 7 * DAY, e]; }
+  const m0 = new Date(now.getFullYear(), now.getMonth(), 1).getTime();
+  if (per === 'm') return [addMonths(m0, off), addMonths(m0, off + 1)];
+  const n = +per, e = addMonths(m0, 1 + off * n);
+  return [addMonths(e, -n), e];
+}
+function renderStats(){
+  $('#ptabs').querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.p === per));
+  const [a, b] = periodRange(), da = new Date(a), db = new Date(b - 1), yNow = new Date().getFullYear();
+  const yr = d => d.getFullYear() !== yNow ? ' ' + d.getFullYear() : '';
+  $('#plabel').textContent =
+    per === 'd' ? da.getDate() + ' ' + MES3[da.getMonth()] + yr(da) :
+    per === 'w' ? da.getDate() + (da.getMonth() !== db.getMonth() ? ' ' + MES3[da.getMonth()] : '') + ' – ' + db.getDate() + ' ' + MES3[db.getMonth()] + yr(db) :
+    per === 'm' ? MES[da.getMonth()].replace(/^./, c => c.toUpperCase()) + ' ' + da.getFullYear() :
+    MES3[da.getMonth()] + ' – ' + MES3[db.getMonth()] + ' ' + db.getFullYear();
+  $('#next').disabled = off >= 0;
+
+  const list = recs.filter(r => r.t >= a && r.t < b).slice().reverse();
+  const vs = list.map(r => r.v);
+  let x0 = 0, x1, xt = [], xunit = '', xf;
+  if (per === 'd') { x1 = 24; xunit = 'h'; xf = t => (t - a) / 36e5; for (let h = 0; h <= 24; h += 4) xt.push([h, h]); }
+  else {
+    x1 = Math.round((b - a) / DAY); xf = t => (t - a) / DAY;
+    if (per === 'w') for (let i = 0; i < 7; i++) xt.push([i + .5, new Date(a + i * DAY + 12 * 36e5).getDate()]);
+    else if (per === 'm') for (const d of [1,5,10,15,20,25,30]) { if (d <= x1) xt.push([d - .5, d]); }
+    else for (let i = 0; i < +per; i++) { const m = new Date(addMonths(a, i)); xt.push([(m.getTime() - a) / DAY + 15, MES3[m.getMonth()]]); }
+  }
+  const lo = vs.length ? Math.min(...vs) : 100, hi = vs.length ? Math.max(...vs) : 100;
+  const y0 = Math.max(0, Math.floor(Math.min(60, lo - 10, cfg.min - 10) / 30) * 30), y1 = Math.ceil(Math.max(240, hi + 10, cfg.max + 20) / 30) * 30;
+  const yt = []; for (let y = y0; y <= y1; y += 30) yt.push(y);
+  $('#statChart').innerHTML = chartSVG({pts: list.map(r => ({x: xf(r.t), y: r.v, c: status(r.v)[2]})), x0, x1, xt, xunit, y0, y1, yt, lim:[cfg.min, cfg.max], ring: per === 'd', h:230});
+  const avg = vs.length ? Math.round(vs.reduce((s, v) => s + v, 0) / vs.length) : '—';
+  $('#sum').innerHTML = `<div><div class="k">Valor promedio</div><div class="avg">${avg} <small>mg/dL</small></div></div>
+    <div class="mm"><div class="k">Mín.</div><b>${vs.length ? lo : '—'}</b><small>mg/dL</small></div>
+    <div class="mm"><div class="k">Máx.</div><b>${vs.length ? hi : '—'}</b><small>mg/dL</small></div>`;
+  if (!vs.length) { $('#cnt').textContent = 'Sin mediciones en este período'; return; }
+  const inR = vs.filter(v => v >= cfg.min && v <= cfg.max).length;
+  $('#cnt').textContent = `${vs.length} ${vs.length === 1 ? 'medición' : 'mediciones'} · ${Math.round(inR * 100 / vs.length)}% dentro del rango`;
+}
+$('#ptabs').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; per = b.dataset.p; off = 0; renderStats(); });
+$('#prev').addEventListener('click', () => { off--; renderStats(); });
+$('#next').addEventListener('click', () => { if (off < 0) { off++; renderStats(); } });
+
+/* ---------- AJUSTES ---------- */
+function renderCfg(){
+  $('#sMin').value = cfg.min; $('#sMax').value = cfg.max;
+  $('#count').textContent = recs.length + ' registro' + (recs.length === 1 ? '' : 's') + ' guardado' + (recs.length === 1 ? '' : 's') + ' en este teléfono.';
+}
+$('#sSave').addEventListener('click', () => {
+  const mn = parseInt($('#sMin').value, 10), mx = parseInt($('#sMax').value, 10);
+  if (!(mn >= 20 && mx <= 600 && mn < mx)) return toast('Revisá los límites: el mínimo tiene que ser menor que el máximo');
+  cfg.min = mn; cfg.max = mx; saveCfg(); renderCfg(); toast('Límites guardados');
+});
+
+function rowsForExport(){ return recs.slice().reverse().map(r => [fmtFull(r.t), TYPES[r.type], String(r.v)]); }
+const stamp = () => ymd(new Date());
+
+$('#expCsv').addEventListener('click', () => {
+  if (!recs.length) return toast('No hay registros para exportar');
+  const q = s => /[";\n]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
+  const csv = '﻿' + [['Fecha','Momento','Glucosa (mg/dL)'], ...rowsForExport()].map(r => r.map(q).join(';')).join('\r\n');
+  deliver(new Blob([csv], {type:'text/csv;charset=utf-8'}), `glucosa_${stamp()}.csv`);
+});
+$('#expPdf').addEventListener('click', () => {
+  if (!recs.length) return toast('No hay registros para exportar');
+  deliver(makePDF(rowsForExport()), `glucosa_${stamp()}.pdf`);
+});
+
+// PDF de texto simple (A4), sin librerías externas.
+function makePDF(rows){
+  const e = s => String(s).replace(/–/g, '-').replace(/[^\x20-\xFF]/g, '?').replace(/([\\()])/g, '\\$1');
+  const txt = (x, y, s, f = 'F1', size = 11) => `BT /${f} ${size} Tf 1 0 0 1 ${x} ${y} Tm (${e(s)}) Tj ET\n`;
+  const PER = 36, pages = [];
+  for (let i = 0; i < rows.length; i += PER) pages.push(rows.slice(i, i + PER));
+  const cols = [50, 230, 430], hdr = ['Fecha', 'Momento', 'Glucosa (mg/dL)'];
+  const streams = pages.map((pg, pi) => {
+    let s = '';
+    let y = 790;
+    if (pi === 0) {
+      s += txt(50, 790, 'Registro de glucosa', 'F2', 18);
+      s += txt(50, 770, `Exportado el ${fmtFull(Date.now())}  -  Rango objetivo: ${cfg.min} a ${cfg.max} mg/dL  -  ${rows.length} registros`, 'F1', 9);
+      y = 735;
+    }
+    hdr.forEach((h, i) => s += txt(cols[i], y, h, 'F2', 11));
+    s += `0.2 G 0.8 w 50 ${y - 6} m 545 ${y - 6} l S\n`;
+    y -= 22;
+    for (const r of pg) {
+      r.forEach((c, i) => s += txt(cols[i], y, c));
+      s += `0.85 G 0.5 w 50 ${y - 6} m 545 ${y - 6} l S\n`;
+      y -= 19;
+    }
+    s += txt(50, 30, `Mi Glucosa  -  Página ${pi + 1} de ${pages.length}`, 'F1', 8);
+    return s;
+  });
+  const objs = [];
+  objs[1] = '<< /Type /Catalog /Pages 2 0 R >>';
+  objs[3] = '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>';
+  objs[4] = '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>';
+  const kids = [];
+  streams.forEach((st, i) => {
+    const pn = 5 + i * 2, cn = pn + 1;
+    kids.push(pn + ' 0 R');
+    objs[pn] = `<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents ${cn} 0 R >>`;
+    objs[cn] = `<< /Length ${st.length} >>\nstream\n${st}endstream`;
+  });
+  objs[2] = `<< /Type /Pages /Kids [${kids.join(' ')}] /Count ${kids.length} >>`;
+  let out = '%PDF-1.4\n'; const offs = [];
+  for (let i = 1; i < objs.length; i++) { offs[i] = out.length; out += `${i} 0 obj\n${objs[i]}\nendobj\n`; }
+  const xref = out.length;
+  out += `xref\n0 ${objs.length}\n0000000000 65535 f \n` + offs.slice(1).map(o => String(o).padStart(10, '0') + ' 00000 n \n').join('');
+  out += `trailer\n<< /Size ${objs.length} /Root 1 0 R >>\nstartxref\n${xref}\n%%EOF`;
+  return new Blob([Uint8Array.from(out, c => c.charCodeAt(0) & 255)], {type:'application/pdf'});
+}
+
+function download(blob, name){
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob); a.download = name;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+}
+function deliver(blob, name){
+  const file = new File([blob], name, {type: blob.type});
+  let canShare = false;
+  try { canShare = !!navigator.canShare?.({files:[file]}); } catch {}
+  openSheet(`<h3>Archivo listo</h3><p>${name}</p>
+    <button class="btn sm" id="dl">Descargar</button>
+    ${canShare ? '<button class="btn sm lite" id="sh">Compartir (WhatsApp, mail, Drive…)</button>' : ''}
+    <button class="btn sm lite" data-close>Cancelar</button>`);
+  $('#dl').onclick = () => { download(blob, name); closeSheet(); toast('Guardado en Descargas'); };
+  if (canShare) $('#sh').onclick = () => { navigator.share({files:[file], title: name}).catch(() => {}); closeSheet(); };
+}
+
+$('#imp').addEventListener('click', () => $('#impFile').click());
+$('#impFile').addEventListener('change', async e => {
+  const f = e.target.files[0]; e.target.value = '';
+  if (!f) return;
+  const res = importCSV(await f.text());
+  saveRecs(); renderAll();
+  toast(`Importados: ${res.ok}` + (res.dup ? ` · ya existían: ${res.dup}` : '') + (res.bad ? ` · con error: ${res.bad}` : ''));
+});
+function importCSV(text){
+  const lines = text.replace(/^﻿/, '').split(/\r?\n/).filter(l => l.trim());
+  const keys = new Set(recs.map(r => Math.floor(r.t / 6e4) + '|' + r.v + '|' + r.type));
+  const res = {ok:0, dup:0, bad:0};
+  for (const line of lines) {
+    const sep = line.includes(';') ? ';' : line.includes('\t') ? '\t' : ',';
+    const cells = (line.match(new RegExp(`("([^"]|"")*"|[^${sep}]*)(${sep}|$)`, 'g')) || []).map(c => c.replace(new RegExp(`${sep}$`), '').trim().replace(/^"|"$/g, '').replace(/""/g, '"'));
+    const [fc, mc, vc, nc] = cells;
+    let m, t = NaN;
+    if ((m = /^(\d{1,2})\/(\d{1,2})\/(\d{4})\s*(\d{1,2}):(\d{2})/.exec(fc || ''))) t = new Date(+m[3], m[2] - 1, +m[1], +m[4], +m[5]).getTime();
+    else if ((m = /^(\d{4})-(\d{2})-(\d{2})[ T](\d{2}):(\d{2})/.exec(fc || ''))) t = new Date(+m[1], m[2] - 1, +m[3], +m[4], +m[5]).getTime();
+    if (isNaN(t)) { if (/fecha/i.test(fc || '')) continue; res.bad++; continue; }
+    const k = (mc || '').toLowerCase();
+    const type = k.includes('ayun') ? 'ayunas' : k.includes('despu') ? 'despues' : k.includes('dormir') ? 'dormir' : k.includes('antes') ? 'antes' : null;
+    const v = Math.round(parseFloat((vc || '').replace(',', '.')));
+    if (!type || !(v >= 20 && v <= 600)) { res.bad++; continue; }
+    const key = Math.floor(t / 6e4) + '|' + v + '|' + type;
+    if (keys.has(key)) { res.dup++; continue; }
+    keys.add(key);
+    recs.push({id: t.toString(36) + Math.random().toString(36).slice(2,6), t, v, type, note: (nc || '').slice(0,120)});
+    res.ok++;
+  }
+  return res;
+}
+
+let installEvt = null;
+window.addEventListener('beforeinstallprompt', e => { e.preventDefault(); installEvt = e; $('#instSec').hidden = false; });
+$('#inst').addEventListener('click', async () => { if (!installEvt) return; installEvt.prompt(); await installEvt.userChoice; installEvt = null; $('#instSec').hidden = true; });
+
+/* ---------- Hojas y navegación ---------- */
+function openSheet(html){ $('#sheet').innerHTML = html; $('#shade').classList.add('on'); $('#sheet').classList.add('on'); }
+function closeSheet(){ $('#shade').classList.remove('on'); $('#sheet').classList.remove('on'); }
+$('#shade').addEventListener('click', closeSheet);
+$('#sheet').addEventListener('click', e => { if (e.target.closest('[data-close]')) closeSheet(); });
+
+function show(v){
+  document.querySelectorAll('.view').forEach(s => s.classList.toggle('on', s.id === 'v-' + v));
+  $('#tabbar').querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.v === v));
+  ({inicio: renderHome, historial: renderHist, estadisticas: renderStats, ajustes: renderCfg})[v]();
+  window.scrollTo(0, 0);
+}
+$('#tabbar').addEventListener('click', e => { const b = e.target.closest('button'); if (b) show(b.dataset.v); });
+function renderAll(){ renderHome(); renderHist(); renderStats(); renderCfg(); }
+
+try { if (window.self !== window.top) $('#preview').hidden = false; } catch { $('#preview').hidden = false; }
+{ const d = new Date(); $('#fDate').value = ymd(d); $('#fTime').value = hm(d); }
+syncNow();
+renderAll();
+if ('serviceWorker' in navigator && location.protocol === 'https:') navigator.serviceWorker.register('sw.js').catch(() => {});
+</script>
+</body>
+</html>
